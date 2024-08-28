@@ -38,4 +38,10 @@ sealed class NavItem(
         selectedIcon = Icons.Filled.People,
     )
 
+    object Scan : NavItem(
+        title = "Scan",
+        route = "scan",
+        unselectedIcon = Icons.Outlined.People,
+        selectedIcon = Icons.Filled.People,
+    )
 }

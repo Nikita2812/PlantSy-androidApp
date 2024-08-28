@@ -6,5 +6,7 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun ChatbotScreen(modifier: Modifier = Modifier) {
-    Text(text = "chat")
+    Text(
+        text = "chat"
+    )
 }

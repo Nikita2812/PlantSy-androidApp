@@ -42,6 +42,7 @@ class MainActivity : ComponentActivity() {
                     NavItem.Home,
                     NavItem.Chatbot,
                     NavItem.Community,
+                    NavItem.Scan,
                 )
                 var selectedItemIndex by rememberSaveable {
                     mutableIntStateOf(0)
@@ -104,7 +105,8 @@ class MainActivity : ComponentActivity() {
 
                     Navgraph(
                         navController = navController,
-                        //modifier = Modifier.padding(innerPadding)
+                        //modifier = Modifier.padding(innerPadding),
+                        paddingValues = innerPadding
                     )
                 }
             }
