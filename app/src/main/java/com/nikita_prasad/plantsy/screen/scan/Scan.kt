@@ -12,8 +12,8 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -25,7 +25,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cameraswitch
 import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.Photo
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,9 +34,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
@@ -48,6 +46,8 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.nikita_prasad.plantsy.screen.CameraPreview
+import com.nikita_prasad.plantsy.utils.viewmodel.ScanVM
+import com.nikita_prasad.plantsy.utils.viewmodel.analyzer
 
 @SuppressLint("RememberReturnType")
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
@@ -67,21 +67,36 @@ fun ScanScreen(
             0
         )
     }
-    val scope = rememberCoroutineScope()
-    val applContext= LocalContext.current.applicationContext
+    val context= LocalContext.current
+    val applContext= context.applicationContext
+
+    val analyzer= remember {
+        analyzer(
+            context = context,
+        )
+    }
+
     val controller = remember{
         LifecycleCameraController(applContext).apply {
             setEnabledUseCases(
                 CameraController.IMAGE_CAPTURE or
-                        CameraController.VIDEO_CAPTURE
-            )}
+                        CameraController.IMAGE_ANALYSIS
+            )
+
+            setImageAnalysisAnalyzer(
+                ContextCompat.getMainExecutor(applContext),
+                analyzer
+            )
+        }
     }
-    val viewModel = viewModel<MainViewModel>()
+    val viewModel = viewModel<ScanVM>()
     val bitmaps by viewModel.bitmaps.collectAsState()
     val applicationcontext = LocalContext.current.applicationContext
     val modalState= remember {
         mutableStateOf(false)
     }
+
+
 
 
 
@@ -91,12 +106,11 @@ fun ScanScreen(
 
     ) {
         if (modalState.value){
-            ModalBottomSheet(onDismissRequest = { modalState.value= false }) {
-                PhotoBottomSheetContent(
-                    bitmaps = bitmaps,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
+            ModalBottomSheet(onDismissRequest = {
+                modalState.value= false
+                viewModel.onClearPhoto()
+            }) {
+                bitmaps?.asImageBitmap()?.let { Image(bitmap= it, contentDescription = null) }
             }
         }
 
