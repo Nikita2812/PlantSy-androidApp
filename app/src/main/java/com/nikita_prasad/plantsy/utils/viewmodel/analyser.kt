@@ -14,7 +14,8 @@ import org.tensorflow.lite.support.image.ops.ResizeOp
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 
 class analyzer(
-    private val context: Context
+    private val context: Context,
+    private val a: (String) -> Unit
 ): ImageAnalysis.Analyzer {
 
     private var frameSkipCounter= 0
@@ -43,6 +44,7 @@ class analyzer(
             inputFeature0.loadBuffer(tensorImage.buffer)
             val outputFeature0 = MainClassifier.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer
             Log.d("analyzerResults", getMaxIndex(outputFeature0.floatArray).toString())
+            a(getMaxIndex(outputFeature0.floatArray).toString())
         }
         frameSkipCounter++
         image.close()
@@ -53,3 +55,4 @@ class analyzer(
     }
 
 }
+

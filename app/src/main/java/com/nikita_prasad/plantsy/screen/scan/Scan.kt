@@ -13,7 +13,9 @@ import androidx.camera.core.ImageProxy
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -29,22 +31,28 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.nikita_prasad.plantsy.navigation.bottombar.NavItem
 import com.nikita_prasad.plantsy.screen.CameraPreview
 import com.nikita_prasad.plantsy.utils.viewmodel.ScanVM
 import com.nikita_prasad.plantsy.utils.viewmodel.analyzer
@@ -53,7 +61,8 @@ import com.nikita_prasad.plantsy.utils.viewmodel.analyzer
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ScanScreen(
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    navController: NavHostController
 ) {
     var cameraPermissionState: PermissionState = rememberPermissionState(permission = Manifest.permission.CAMERA)
 
@@ -69,10 +78,16 @@ fun ScanScreen(
     }
     val context= LocalContext.current
     val applContext= context.applicationContext
+    var result by remember {
+        mutableStateOf("")
+    }
 
     val analyzer= remember {
         analyzer(
             context = context,
+            a={
+                result=it
+            }
         )
     }
 
@@ -96,10 +111,6 @@ fun ScanScreen(
         mutableStateOf(false)
     }
 
-
-
-
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -110,7 +121,22 @@ fun ScanScreen(
                 modalState.value= false
                 viewModel.onClearPhoto()
             }) {
-                bitmaps?.asImageBitmap()?.let { Image(bitmap= it, contentDescription = null) }
+                Column {
+                    bitmaps?.asImageBitmap()?.let { Image(bitmap= it, contentDescription = null) }
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            modifier = Modifier.clickable {
+                                navController.navigate(route = NavItem.Detail.passResult(5))
+                            },
+                            text = "go to details"
+                        )
+                    }
+                }
             }
         }
 
@@ -158,17 +184,22 @@ fun ScanScreen(
                 onClick = {
                     takePhoto(
                         controller = controller,
-                        onPhotoTaken = viewModel::onTakePhoto,
+                        onPhotoTaken = {
+                            viewModel.onTakePhoto(it)
+                            modalState.value=true
+                        },
                         applicationcontext = applicationcontext
                     )
                 }
-            ){
+            )
+            {
                 Icon(
                     imageVector = Icons.Default.Photo,
                     contentDescription = "Take photo"
 
                 )
             }
+            Text(text = result)
 
         }
 
