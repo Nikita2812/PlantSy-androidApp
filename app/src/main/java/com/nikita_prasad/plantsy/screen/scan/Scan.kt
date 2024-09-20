@@ -42,11 +42,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
@@ -62,7 +60,8 @@ import com.nikita_prasad.plantsy.utils.viewmodel.analyzer
 @Composable
 fun ScanScreen(
     paddingValues: PaddingValues,
-    navController: NavHostController
+    navController: NavHostController,
+    scanVM: ScanVM
 ) {
     var cameraPermissionState: PermissionState = rememberPermissionState(permission = Manifest.permission.CAMERA)
 
@@ -104,8 +103,7 @@ fun ScanScreen(
             )
         }
     }
-    val viewModel = viewModel<ScanVM>()
-    val bitmaps by viewModel.bitmaps.collectAsState()
+    val bitmaps by scanVM.bitmaps.collectAsState()
     val applicationcontext = LocalContext.current.applicationContext
     val modalState= remember {
         mutableStateOf(false)
@@ -119,7 +117,6 @@ fun ScanScreen(
         if (modalState.value){
             ModalBottomSheet(onDismissRequest = {
                 modalState.value= false
-                viewModel.onClearPhoto()
             }) {
                 Column {
                     bitmaps?.asImageBitmap()?.let { Image(bitmap= it, contentDescription = null) }
@@ -185,7 +182,7 @@ fun ScanScreen(
                     takePhoto(
                         controller = controller,
                         onPhotoTaken = {
-                            viewModel.onTakePhoto(it)
+                            scanVM.onTakePhoto(it)
                             modalState.value=true
                         },
                         applicationcontext = applicationcontext
