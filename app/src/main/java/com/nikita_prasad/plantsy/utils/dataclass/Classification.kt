@@ -1,4 +1,4 @@
-package com.nikita_prasad.plantsy.DataClass
+package com.nikita_prasad.plantsy.utils.dataclass
 
 data class Classification(
     val index: Int,

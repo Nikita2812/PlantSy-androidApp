@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.nikita_prasad.plantsy.DataClass.Classification
+import com.nikita_prasad.plantsy.utils.dataclass.Classification
 import com.nikita_prasad.plantsy.ml.AppleBlackRot
 import com.nikita_prasad.plantsy.ml.AppleScab
 import com.nikita_prasad.plantsy.ml.CedarAppleRust

@@ -6,7 +6,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.nikita_prasad.plantsy.DataClass.Classification
+import com.nikita_prasad.plantsy.utils.dataclass.Classification
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
