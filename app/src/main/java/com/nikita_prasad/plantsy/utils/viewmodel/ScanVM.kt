@@ -44,7 +44,7 @@ class ScanVM(application: Application): AndroidViewModel(application){
     val isLoadingBoolean = _loadingBoolean.asStateFlow()
 
     private val _maxIndex=MutableStateFlow(
-        Classification(confidence = 0f, index = 404, parentindex = 404)
+        Classification(index = 404, confidence = 0f, parentindex = 404,)
     )
 
     val maxIndex= _maxIndex.asStateFlow()
@@ -86,10 +86,24 @@ class ScanVM(application: Application): AndroidViewModel(application){
             }
 
         }
+        sortClassifiedList()
         Log.d("MNormal", _normalBoolean.value.toString())
         Log.d("successIndexVMErrored", _erroredBoolean.value.toString())
         Log.d("successIndexVMList", _listPrediction.value.toString())
 
 
     }
+    private fun sortClassifiedList(){
+        val maxValue= _listPrediction.value.maxByOrNull { it.confidence }?.confidence ?:0
+        val notMaxElements= mutableListOf<Classification>()
+
+        Log.d("classificationData", _listPrediction.value.toString())
+        for (data in _listPrediction.value){
+            if (data.confidence==maxValue) _maxIndex.value= (data) else notMaxElements.add(data)
+        }
+        _notMaxElements.value= notMaxElements
+        Log.d("classificationDataHighest", _maxIndex.value.toString())
+        Log.d("classificationDataSorted", _notMaxElements.value.toString())
+    }
+
 }

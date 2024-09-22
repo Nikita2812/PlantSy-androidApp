@@ -57,7 +57,7 @@ class ClassifierVM: ViewModel() {
             .outputFeature0AsTensorBuffer
         val maxIndexScab= getMaxIndex(outputScab.floatArray)
         predictedClass.add(
-            Classification(maxIndexScab, outputScab.floatArray[maxIndexScab]*100, 0)
+            Classification(maxIndexScab, outputScab.floatArray[maxIndexScab]*100, 0,)
         )
         val outputPre= AppleBlackRot
             .newInstance(context)
@@ -65,7 +65,7 @@ class ClassifierVM: ViewModel() {
             .outputFeature0AsTensorBuffer
         val maxIndexPre= getMaxIndex(outputPre.floatArray)
         predictedClass.add(
-            Classification(maxIndexPre, outputPre.floatArray[maxIndexPre]*100, 1)
+            Classification(maxIndexPre, outputPre.floatArray[maxIndexPre]*100, 1,)
         )
         val outputPreRust= CedarAppleRust
             .newInstance(context)
@@ -76,7 +76,7 @@ class ClassifierVM: ViewModel() {
             Classification(
                 maxIndexPreRust,
                 outputPreRust.floatArray[maxIndexPreRust]*100,
-                2,
+                2
             )
         )
         Log.d("successIndexVM", predictedClass.toString())
@@ -126,7 +126,7 @@ class ClassifierVM: ViewModel() {
             Classification(
                 maxIndexcherry,
                 outputcherry.floatArray[maxIndexcherry]*100,
-                0,
+                0
             )
         )
         return predictedClass
@@ -146,7 +146,7 @@ class ClassifierVM: ViewModel() {
             Classification(
                 maxIndexcitrus,
                 outputcitrus.floatArray[maxIndexcitrus] * 100,
-                0,
+                0
             )
         )
         return predictedClass
