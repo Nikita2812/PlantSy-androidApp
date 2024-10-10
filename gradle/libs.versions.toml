@@ -14,6 +14,8 @@ playServicesFitness = "21.2.0"
 tensorflowLiteGpu = "2.3.0"
 tensorflowLiteMetadata = "0.1.0"
 tensorflowLiteSupport = "0.1.0"
+roomCommon = "2.6.1"
+roomCommonJvm = "2.7.0-alpha08"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -36,6 +38,8 @@ play-services-fitness = { group = "com.google.android.gms", name = "play-service
 tensorflow-lite-gpu = { module = "org.tensorflow:tensorflow-lite-gpu", version.ref = "tensorflowLiteGpu" }
 tensorflow-lite-metadata = { module = "org.tensorflow:tensorflow-lite-metadata", version.ref = "tensorflowLiteMetadata" }
 tensorflow-lite-support = { module = "org.tensorflow:tensorflow-lite-support", version.ref = "tensorflowLiteSupport" }
+androidx-room-common = { group = "androidx.room", name = "room-common", version.ref = "roomCommon" }
+androidx-room-common-jvm = { group = "androidx.room", name = "room-common-jvm", version.ref = "roomCommonJvm" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

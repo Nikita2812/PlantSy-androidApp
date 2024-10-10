@@ -3,12 +3,15 @@ package com.nikita_prasad.plantsy.navigation.bottombar
 import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.nikita_prasad.plantsy.database.appDB.diseaseInfo.DiseaseDC
+import com.nikita_prasad.plantsy.database.appDB.diseaseInfo.diseaseDBvm
 import com.nikita_prasad.plantsy.screen.ChatbotScreen
 import com.nikita_prasad.plantsy.screen.CommunityScreen
 import com.nikita_prasad.plantsy.screen.HomeScreen
@@ -21,7 +24,25 @@ fun Navgraph(
     navController: NavHostController,
     paddingValues: PaddingValues
 ) {
+    // declaring all viewmodels
     val savePhotoViewModel= viewModel<ScanVM>()
+    val diseaseDBVM= viewModel<diseaseDBvm>()
+
+    LaunchedEffect(true) {
+        diseaseDBVM.insertDiseases(
+            DiseaseDC(
+                cure = "",
+                cover_link = "",
+                cure_cycle = "",
+                disease_name = "",
+                diseaseIndex = "",
+                domain = "",
+                introduction = "",
+                symptoms = ""
+            )
+        )
+    }
+
     NavHost(
         navController = navController,
         startDestination = NavItem.Home.route,
