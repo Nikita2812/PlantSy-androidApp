@@ -28,21 +28,6 @@ fun Navgraph(
     val savePhotoViewModel= viewModel<ScanVM>()
     val diseaseDBVM= viewModel<diseaseDBvm>()
 
-    LaunchedEffect(true) {
-        diseaseDBVM.insertDiseases(
-            DiseaseDC(
-                cure = "",
-                cover_link = "",
-                cure_cycle = "",
-                disease_name = "",
-                diseaseIndex = "",
-                domain = "",
-                introduction = "",
-                symptoms = ""
-            )
-        )
-    }
-
     NavHost(
         navController = navController,
         startDestination = NavItem.Home.route,
