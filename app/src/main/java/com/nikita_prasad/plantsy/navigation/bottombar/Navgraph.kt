@@ -10,7 +10,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.nikita_prasad.plantsy.database.appDB.diseaseInfo.DiseaseDC
 import com.nikita_prasad.plantsy.database.appDB.diseaseInfo.diseaseDBvm
 import com.nikita_prasad.plantsy.screen.ChatbotScreen
 import com.nikita_prasad.plantsy.screen.CommunityScreen
@@ -18,6 +17,7 @@ import com.nikita_prasad.plantsy.screen.HomeScreen
 import com.nikita_prasad.plantsy.screen.scan.DetailScreen
 import com.nikita_prasad.plantsy.screen.scan.ScanScreen
 import com.nikita_prasad.plantsy.utils.viewmodel.ScanVM
+import com.nikita_prasad.plantsy.utils.viewmodel.readDataVM
 
 @Composable
 fun Navgraph(
@@ -27,6 +27,11 @@ fun Navgraph(
     // declaring all viewmodels
     val savePhotoViewModel= viewModel<ScanVM>()
     val diseaseDBVM= viewModel<diseaseDBvm>()
+    val readDataVM = viewModel<readDataVM>()
+
+    LaunchedEffect(Unit) {
+        readDataVM.fetchDiseaseData()
+    }
 
     NavHost(
         navController = navController,
