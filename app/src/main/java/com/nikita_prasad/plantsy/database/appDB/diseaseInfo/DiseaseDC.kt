@@ -6,12 +6,13 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "disease_dataset")
 data class DiseaseDC (
     val cure : String,
-    val cure_cycle : String,
+    val cure_cycle: Long,
     @PrimaryKey(autoGenerate = false)
     val disease_name : String,
     val domain : String,
-    val diseaseIndex : String,
+    val diseaseIndex: Long,
     val introduction : String,
     val symptoms : String,
     val cover_link : String,
+    val plantIndex: Long
 )
