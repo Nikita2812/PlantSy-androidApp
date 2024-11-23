@@ -44,7 +44,7 @@ class ScanVM(application: Application): AndroidViewModel(application){
     val isLoadingBoolean = _loadingBoolean.asStateFlow()
 
     private val _maxIndex=MutableStateFlow(
-        Classification(index = 404, confidence = 0f, parentindex = 404,)
+        Classification(index = 404, confidence = 0f, diseaseIndex = 404)
     )
 
     val maxIndex= _maxIndex.asStateFlow()
