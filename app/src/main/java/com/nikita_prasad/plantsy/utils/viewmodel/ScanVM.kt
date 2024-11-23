@@ -61,12 +61,16 @@ class ScanVM(application: Application): AndroidViewModel(application){
   //  private val _updatedClassificationData= MutableStateFlow(disease_data_dataClass())
 
 
-    suspend fun onClassify(context: Context, index: Int){
+    fun onClassify(context: Context, plantIndex: Int) {
         _listPrediction.value = emptyList()
         _normalBoolean.value = false
         _reloadingBoolean.value = true
         val rawClassification = try {
-            viewModelClassifier.classify(context = context, bitmap = _bitmaps.value!!, result = index)
+            viewModelClassifier.classify(
+                context = context,
+                bitmap = _bitmaps.value!!,
+                result = plantIndex
+            )
         } catch (e: Exception){
             Log.e("successIndex", e.printStackTrace().toString())
             emptyList()
@@ -82,28 +86,25 @@ class ScanVM(application: Application): AndroidViewModel(application){
                 _loadingBoolean.value = false
                 _reloadingBoolean.value = false
             } else {
-               // classificationData(group_number = index)
+                findMaxConfidence()
             }
 
         }
-        sortClassifiedList()
         Log.d("MNormal", _normalBoolean.value.toString())
         Log.d("successIndexVMErrored", _erroredBoolean.value.toString())
         Log.d("successIndexVMList", _listPrediction.value.toString())
 
-
     }
-    private fun sortClassifiedList(){
-        val maxValue= _listPrediction.value.maxByOrNull { it.confidence }?.confidence ?:0
-        val notMaxElements= mutableListOf<Classification>()
 
-        Log.d("classificationData", _listPrediction.value.toString())
+    private fun findMaxConfidence() {
+        Log.d("filteredData", "before: ${_listPrediction.value}")
+        var highestConfidenceDisease = _listPrediction.value[0]
         for (data in _listPrediction.value){
-            if (data.confidence==maxValue) _maxIndex.value= (data) else notMaxElements.add(data)
+            if (data.confidence > highestConfidenceDisease.confidence) {
+                highestConfidenceDisease = data
+            }
         }
-        _notMaxElements.value= notMaxElements
-        Log.d("classificationDataHighest", _maxIndex.value.toString())
-        Log.d("classificationDataSorted", _notMaxElements.value.toString())
+        _maxIndex.value = highestConfidenceDisease
+        Log.d("filteredData", "after: $highestConfidenceDisease")
     }
-
 }

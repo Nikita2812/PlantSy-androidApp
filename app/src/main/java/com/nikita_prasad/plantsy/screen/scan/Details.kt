@@ -1,7 +1,5 @@
 package com.nikita_prasad.plantsy.screen.scan
 
-import android.content.Context
-import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,7 +25,7 @@ fun DetailScreen(
     val context= LocalContext.current
     val bitmap = savePhotoviewModel.bitmaps.collectAsState()
     LaunchedEffect(true) {
-        savePhotoviewModel.onClassify(context, index = result)
+        savePhotoviewModel.onClassify(context, plantIndex = result)
     }
     Column(
         modifier = Modifier
