@@ -13,4 +13,8 @@ interface diseaseDAO {
 
     @Query("SELECT * FROM disease_dataset")
     suspend fun readDB(): List<DiseaseDC>
+
+    @Query("SELECT * FROM disease_dataset WHERE diseaseIndex = :diseaseIndex and plantIndex = :plantIndex")
+    suspend fun getDiseaseData(diseaseIndex: Long, plantIndex: Long): DiseaseDC
+
 }

@@ -28,7 +28,10 @@ fun Navgraph(
     val diseaseDBVM= viewModel<diseaseDBvm>()
 
     LaunchedEffect(Unit) {
+        Log.d("dbStatus", "triggered")
         diseaseDBVM.fetchDiseaseData()
+        Log.d("dbStatus", "after fetch")
+        Log.d("dbStatus1", "query result: ${diseaseDBVM.getDiseaseData(1, 0)}")
     }
 
     NavHost(
