@@ -77,15 +77,15 @@ fun ScanScreen(
     }
     val context= LocalContext.current
     val applContext= context.applicationContext
-    var result by remember {
-        mutableStateOf("")
+    var plantIndex by remember {
+        mutableStateOf(Int.MAX_VALUE)
     }
 
     val analyzer= remember {
         analyzer(
             context = context,
             a={
-                result=it
+                plantIndex = it.toInt()
             }
         )
     }
@@ -128,7 +128,7 @@ fun ScanScreen(
                     ) {
                         Text(
                             modifier = Modifier.clickable {
-                                navController.navigate(route = NavItem.Detail.passResult(result.toInt()))
+                                navController.navigate(route = NavItem.Detail.passResult(plantIndex.toInt()))
                             },
                             text = "go to details"
                         )
@@ -196,7 +196,7 @@ fun ScanScreen(
 
                 )
             }
-            Text(text = result)
+            Text(text = plantIndex.toString())
 
         }
 

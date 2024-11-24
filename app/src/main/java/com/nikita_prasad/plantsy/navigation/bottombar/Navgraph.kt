@@ -67,7 +67,7 @@ fun Navgraph(
         )  {
             Log.d("Args",it.arguments?.getInt(DETAIL_ARGUMENT_KEY).toString())
             DetailScreen(
-                result = it.arguments?.getInt(DETAIL_ARGUMENT_KEY) ?: 0,
+                plantIndex = it.arguments?.getInt(DETAIL_ARGUMENT_KEY) ?: 0,
                 savePhotoviewModel = savePhotoViewModel
             )
         }

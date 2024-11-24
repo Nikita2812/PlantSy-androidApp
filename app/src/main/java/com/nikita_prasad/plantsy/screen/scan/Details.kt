@@ -19,13 +19,13 @@ import com.nikita_prasad.plantsy.utils.viewmodel.ScanVM
 
 @Composable
 fun DetailScreen(
-    result: Int,
+    plantIndex: Int,
     savePhotoviewModel: ScanVM,
 ) {
     val context= LocalContext.current
     val bitmap = savePhotoviewModel.bitmaps.collectAsState()
     LaunchedEffect(true) {
-        savePhotoviewModel.onClassify(context, plantIndex = result)
+        savePhotoviewModel.onClassify(context, plantIndex = plantIndex)
     }
     val data = savePhotoviewModel.data.collectAsState().value
 
@@ -36,7 +36,8 @@ fun DetailScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        Text(text = "Result: $result",
+        Text(
+            text = "Result: $plantIndex",
             fontSize = 24.sp
         )
         Image(
