@@ -27,6 +27,8 @@ fun DetailScreen(
     LaunchedEffect(true) {
         savePhotoviewModel.onClassify(context, plantIndex = result)
     }
+    val data = savePhotoviewModel.data.collectAsState().value
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -41,5 +43,7 @@ fun DetailScreen(
             bitmap = bitmap.value!!.asImageBitmap(),
             ""
         )
+        Text(text = "Disease: ${data.disease_name}")
+
     }
 }

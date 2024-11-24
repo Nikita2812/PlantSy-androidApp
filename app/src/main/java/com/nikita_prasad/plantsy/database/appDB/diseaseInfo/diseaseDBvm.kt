@@ -13,6 +13,7 @@ class diseaseDBvm(application: Application): AndroidViewModel(application) {
     private val diseaseRepo: diseaseRepo
     private val diseaseDAO: diseaseDAO
 
+
     init{
         diseaseDAO= appDataDB.getAppDBReference(application).diseaseDAO()
         diseaseRepo= diseaseRepo(diseaseDAO)
@@ -25,7 +26,6 @@ class diseaseDBvm(application: Application): AndroidViewModel(application) {
     suspend fun readDiseases(): List<DiseaseDC>{
         return diseaseRepo.readDB()
     }
-
     suspend fun getDiseaseData(diseaseIndex: Long, plantIndex: Long): DiseaseDC {
         return diseaseRepo.getDiseaseData(diseaseIndex = diseaseIndex, plantIndex = plantIndex)
     }

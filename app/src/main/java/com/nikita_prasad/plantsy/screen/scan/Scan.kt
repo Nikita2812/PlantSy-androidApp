@@ -128,7 +128,7 @@ fun ScanScreen(
                     ) {
                         Text(
                             modifier = Modifier.clickable {
-                                navController.navigate(route = NavItem.Detail.passResult(5))
+                                navController.navigate(route = NavItem.Detail.passResult(result.toInt()))
                             },
                             text = "go to details"
                         )
