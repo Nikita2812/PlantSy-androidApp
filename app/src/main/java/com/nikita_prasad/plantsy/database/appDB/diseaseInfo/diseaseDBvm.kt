@@ -30,7 +30,9 @@ class diseaseDBvm(application: Application): AndroidViewModel(application) {
         return diseaseRepo.getDiseaseData(diseaseIndex = diseaseIndex, plantIndex = plantIndex)
     }
 
-    suspend fun fetchDiseaseData() {
+    suspend fun fetchDiseaseData(
+        onCompletion: () -> Unit
+    ) {
         val dataInstance = Firebase.firestore
         try {
             for (data in dataInstance.collection("disease").get()
@@ -50,6 +52,7 @@ class diseaseDBvm(application: Application): AndroidViewModel(application) {
                     )
                     insertDiseases(cleanedData)
                     Log.d("dbStatus", "after clearing: $cleanedData")
+                    onCompletion()
                 } else Log.e("dbStatus", "data is null")
             }
         } catch (e: Exception) {

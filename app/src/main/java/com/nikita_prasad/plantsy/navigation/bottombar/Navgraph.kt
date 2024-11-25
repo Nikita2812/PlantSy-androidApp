@@ -1,9 +1,11 @@
 package com.nikita_prasad.plantsy.navigation.bottombar
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -18,6 +20,7 @@ import com.nikita_prasad.plantsy.screen.scan.DetailScreen
 import com.nikita_prasad.plantsy.screen.scan.ScanScreen
 import com.nikita_prasad.plantsy.utils.viewmodel.ScanVM
 
+
 @Composable
 fun Navgraph(
     navController: NavHostController,
@@ -28,11 +31,24 @@ fun Navgraph(
     val diseaseDBVM= viewModel<diseaseDBvm>()
 
     savePhotoViewModel.initialize(diseaseDBVM)
+    val context = LocalContext.current
+    val versionName = context.packageManager.getPackageInfo(context.packageName, 0).versionName
 
-    LaunchedEffect(Unit) {
-        Log.d("dbStatus", "triggered")
-        diseaseDBVM.fetchDiseaseData()
-        Log.d("dbStatus", "after fetch")
+    LaunchedEffect(true) {
+        val sharedPreferences =
+            context.getSharedPreferences("packageVersionName", Context.MODE_PRIVATE)
+        val versionNameSF = sharedPreferences.getString("packageVersionName", "null")
+
+        if (versionName != versionNameSF) {
+            Log.d("dbStatus", "triggered")
+            diseaseDBVM.fetchDiseaseData(
+                onCompletion = {
+                    sharedPreferences.edit().putString("packageVersionName", versionName).apply()
+                }
+            )
+            Log.d("dbStatus", "after fetch")
+        } else Log.d("dbStatus", "not triggered")
+
     }
 
     NavHost(
