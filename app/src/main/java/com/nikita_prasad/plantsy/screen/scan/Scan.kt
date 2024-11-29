@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
@@ -33,6 +34,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +52,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.nikita_prasad.plantsy.database.appDB.diseaseInfo.diseaseDBvm
 import com.nikita_prasad.plantsy.navigation.bottombar.NavItem
 import com.nikita_prasad.plantsy.screen.CameraPreview
 import com.nikita_prasad.plantsy.utils.viewmodel.ScanVM
@@ -61,7 +64,8 @@ import com.nikita_prasad.plantsy.utils.viewmodel.analyzer
 fun ScanScreen(
     paddingValues: PaddingValues,
     navController: NavHostController,
-    scanVM: ScanVM
+    scanVM: ScanVM,
+    diseaseDBvm: diseaseDBvm
 ) {
     var cameraPermissionState: PermissionState = rememberPermissionState(permission = Manifest.permission.CAMERA)
 
@@ -80,6 +84,8 @@ fun ScanScreen(
     var plantIndex by remember {
         mutableStateOf(Int.MAX_VALUE)
     }
+
+    var detectedPlant by remember { mutableStateOf("") }
 
     val analyzer= remember {
         analyzer(
@@ -103,6 +109,12 @@ fun ScanScreen(
             )
         }
     }
+    LaunchedEffect(plantIndex) {
+        if (plantIndex != Int.MAX_VALUE) {
+            detectedPlant = diseaseDBvm.getDomain(plantIndex.toLong())
+        }
+    }
+
     val bitmaps by scanVM.bitmaps.collectAsState()
     val applicationcontext = LocalContext.current.applicationContext
     val modalState= remember {
@@ -111,8 +123,8 @@ fun ScanScreen(
 
     Column(
         modifier = Modifier
+            .padding(paddingValues)
             .fillMaxSize()
-
     ) {
         if (modalState.value){
             ModalBottomSheet(onDismissRequest = {
@@ -120,7 +132,6 @@ fun ScanScreen(
             }) {
                 Column {
                     bitmaps?.asImageBitmap()?.let { Image(bitmap= it, contentDescription = null) }
-
                     Box(
                         modifier = Modifier
                             .fillMaxSize(),
@@ -128,7 +139,13 @@ fun ScanScreen(
                     ) {
                         Text(
                             modifier = Modifier.clickable {
-                                navController.navigate(route = NavItem.Detail.passResult(plantIndex.toInt()))
+                                if (plantIndex.isMaxValue()) {
+                                    navController.navigate(
+                                        route = NavItem.Detail.passResult(
+                                            plantIndex
+                                        )
+                                    )
+                                }
                             },
                             text = "go to details"
                         )
@@ -140,7 +157,8 @@ fun ScanScreen(
         CameraPreview(
             controller = controller,
             modifier = Modifier
-                .fillMaxSize(.5f)
+                .fillMaxHeight(.8f)
+                .fillMaxWidth()
         )
         IconButton(
             onClick = {
@@ -196,7 +214,7 @@ fun ScanScreen(
 
                 )
             }
-            Text(text = plantIndex.toString())
+            Text(text = detectedPlant)
 
         }
 
@@ -225,4 +243,9 @@ private fun takePhoto(
             }
         }
     )
+}
+
+fun Int.isMaxValue(): Boolean {
+    if (Int.MAX_VALUE == this) return false
+    return true
 }

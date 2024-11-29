@@ -14,4 +14,7 @@ class diseaseRepo(private val diseaseDAO: diseaseDAO) {
         return diseaseDAO.getDiseaseData(diseaseIndex = diseaseIndex, plantIndex = plantIndex)
     }
 
+    suspend fun getDomain(plantIndex: Long): String {
+        return diseaseDAO.getDomain(plantIndex = plantIndex)
+    }
 }

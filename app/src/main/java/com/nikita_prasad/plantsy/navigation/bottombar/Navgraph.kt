@@ -39,6 +39,8 @@ fun Navgraph(
             context.getSharedPreferences("packageVersionName", Context.MODE_PRIVATE)
         val versionNameSF = sharedPreferences.getString("packageVersionName", "null")
 
+        Log.d("pckge", "versionName: $versionName, versionNameSF: $versionNameSF")
+
         if (versionName != versionNameSF) {
             Log.d("dbStatus", "triggered")
             diseaseDBVM.fetchDiseaseData(
@@ -71,7 +73,8 @@ fun Navgraph(
         composable(route = NavItem.Scan.route) {
             ScanScreen(paddingValues = paddingValues,
                 navController = navController,
-                scanVM = savePhotoViewModel
+                scanVM = savePhotoViewModel,
+                diseaseDBvm = diseaseDBVM
             )
         }
 

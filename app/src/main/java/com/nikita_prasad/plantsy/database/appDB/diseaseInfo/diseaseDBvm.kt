@@ -30,6 +30,10 @@ class diseaseDBvm(application: Application): AndroidViewModel(application) {
         return diseaseRepo.getDiseaseData(diseaseIndex = diseaseIndex, plantIndex = plantIndex)
     }
 
+    suspend fun getDomain(plantIndex: Long): String {
+        return diseaseRepo.getDomain(plantIndex = plantIndex)
+    }
+
     suspend fun fetchDiseaseData(
         onCompletion: () -> Unit
     ) {
@@ -59,7 +63,7 @@ class diseaseDBvm(application: Application): AndroidViewModel(application) {
             Log.d(
                 "dbStatus",
                 e.toString()
-            ) // [] me jo h it should exactly match the keys in every documents match ki ho?
+            )
         }
     }
 }
