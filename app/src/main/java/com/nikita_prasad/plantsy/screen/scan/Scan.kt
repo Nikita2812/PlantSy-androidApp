@@ -25,14 +25,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Cameraswitch
 import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.Photo
+import androidx.compose.material.icons.filled.SettingsSuggest
+import androidx.compose.material.icons.outlined.FlashOff
+import androidx.compose.material.icons.outlined.FlashOn
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,7 +52,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
@@ -58,7 +68,7 @@ import com.nikita_prasad.plantsy.screen.CameraPreview
 import com.nikita_prasad.plantsy.utils.viewmodel.ScanVM
 import com.nikita_prasad.plantsy.utils.viewmodel.analyzer
 
-@SuppressLint("RememberReturnType")
+@SuppressLint("RememberReturnType", "UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ScanScreen(
@@ -67,9 +77,10 @@ fun ScanScreen(
     scanVM: ScanVM,
     diseaseDBvm: diseaseDBvm
 ) {
-    var cameraPermissionState: PermissionState = rememberPermissionState(permission = Manifest.permission.CAMERA)
+    var cameraPermissionState: PermissionState =
+        rememberPermissionState(permission = Manifest.permission.CAMERA)
 
-    if (cameraPermissionState.status.isGranted){
+    if (cameraPermissionState.status.isGranted) {
         Log.d("permission", "permissionGranted")
     } else {
         Log.d("permission", "permissionNOtGranted")
@@ -79,24 +90,25 @@ fun ScanScreen(
             0
         )
     }
-    val context= LocalContext.current
-    val applContext= context.applicationContext
+
+    val context = LocalContext.current
+    val applContext = context.applicationContext
     var plantIndex by remember {
         mutableStateOf(Int.MAX_VALUE)
     }
 
     var detectedPlant by remember { mutableStateOf("") }
 
-    val analyzer= remember {
+    val analyzer = remember {
         analyzer(
             context = context,
-            a={
+            a = {
                 plantIndex = it.toInt()
             }
         )
     }
 
-    val controller = remember{
+    val controller = remember {
         LifecycleCameraController(applContext).apply {
             setEnabledUseCases(
                 CameraController.IMAGE_CAPTURE or
@@ -117,125 +129,195 @@ fun ScanScreen(
 
     val bitmaps by scanVM.bitmaps.collectAsState()
     val applicationcontext = LocalContext.current.applicationContext
-    val modalState= remember {
+    val modalState = remember {
         mutableStateOf(false)
     }
+    val flashLightMode = remember {
+        mutableStateOf(FlashlightMode.Off)
+    }
+    when (flashLightMode.value) {
+        FlashlightMode.Off -> controller.cameraControl?.enableTorch(false)
+        FlashlightMode.On -> controller.cameraControl?.enableTorch(true)
+    }  //update the flag upon click on the button
 
-    Column(
-        modifier = Modifier
-            .padding(paddingValues)
-            .fillMaxSize()
-    ) {
-        if (modalState.value){
-            ModalBottomSheet(onDismissRequest = {
-                modalState.value= false
-            }) {
-                Column {
-                    bitmaps?.asImageBitmap()?.let { Image(bitmap= it, contentDescription = null) }
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.Center
+
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = "Scan",
+                        fontWeight = FontWeight(600),
+                        fontSize = 26.sp
+                    )
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                ),
+                actions = {
+                    IconButton(
+                        onClick = {}
                     ) {
-                        Text(
-                            modifier = Modifier.clickable {
-                                if (plantIndex.isMaxValue()) {
-                                    navController.navigate(
-                                        route = NavItem.Detail.passResult(
-                                            plantIndex
-                                        )
-                                    )
-                                }
-                            },
-                            text = "go to details"
+                        Icon(
+                            imageVector = Icons.Default.SettingsSuggest,
+                            contentDescription = "settings"
+                        )
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navController.popBackStack()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBackIosNew,
+                            contentDescription = "back"
                         )
                     }
                 }
-            }
-        }
-
-        CameraPreview(
-            controller = controller,
-            modifier = Modifier
-                .fillMaxHeight(.8f)
-                .fillMaxWidth()
-        )
-        IconButton(
-            onClick = {
-                controller.cameraSelector =
-                    if (controller.cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) {
-                        CameraSelector.DEFAULT_FRONT_CAMERA
-                    } else {
-                        CameraSelector.DEFAULT_BACK_CAMERA
-                    }
-            },
-            modifier = Modifier.offset(16.dp, 16.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Cameraswitch,
-                contentDescription = "switch camera"
             )
 
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                //.align(Alignment.BottomCenter)
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            IconButton(
-                onClick = {
-                    modalState.value=true
-                }
-            ){
-                Icon(
-                    imageVector = Icons.Default.Collections,
-                    contentDescription = "open gallery"
+        },
+        modifier = Modifier
+            .fillMaxSize()
+    )
 
-                )
+    {
+
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+        ) {
+            if (modalState.value) {
+                ModalBottomSheet(onDismissRequest = {
+                    modalState.value = false
+                }) {
+                    Column {
+                        bitmaps?.asImageBitmap()
+                            ?.let { Image(bitmap = it, contentDescription = null) }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                modifier = Modifier.clickable {
+                                    if (plantIndex.isMaxValue()) {
+                                        navController.navigate(
+                                            route = NavItem.Detail.passResult(
+                                                plantIndex
+                                            )
+                                        )
+                                    }
+                                },
+                                text = "go to details"
+                            )
+                        }
+                    }
+                }
             }
+
+            CameraPreview(
+                controller = controller,
+                modifier = Modifier
+                    .fillMaxHeight(.8f)
+                    .fillMaxWidth()
+            )
             IconButton(
                 onClick = {
-                    takePhoto(
-                        controller = controller,
-                        onPhotoTaken = {
-                            scanVM.onTakePhoto(it)
-                            modalState.value=true
-                        },
-                        applicationcontext = applicationcontext
+                    controller.cameraSelector =
+                        if (controller.cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) {
+                            CameraSelector.DEFAULT_FRONT_CAMERA
+                        } else {
+                            CameraSelector.DEFAULT_BACK_CAMERA
+                        }
+                },
+                modifier = Modifier.offset(16.dp, 16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Cameraswitch,
+                    contentDescription = "switch camera"
+                )
+
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    //.align(Alignment.BottomCenter)
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                IconButton(
+                    onClick = {
+                        modalState.value = true
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Collections,
+                        contentDescription = "open gallery"
+
                     )
                 }
-            )
-            {
-                Icon(
-                    imageVector = Icons.Default.Photo,
-                    contentDescription = "Take photo"
-
+                IconButton(
+                    onClick = {
+                        takePhoto(
+                            controller = controller,
+                            onPhotoTaken = {
+                                scanVM.onTakePhoto(it)
+                                modalState.value = true
+                            },
+                            applicationcontext = applicationcontext
+                        )
+                    }
                 )
+                {
+                    Icon(
+                        imageVector = Icons.Default.Photo,
+                        contentDescription = "Take photo"
+
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        if (flashLightMode.value == FlashlightMode.Off) {
+                            flashLightMode.value = FlashlightMode.On
+                        } else {
+                            flashLightMode.value = FlashlightMode.Off
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = if (flashLightMode.value == FlashlightMode.Off) Icons.Outlined.FlashOff else Icons.Outlined.FlashOn,
+                        contentDescription = "flashlight"
+                    )
+                }
+                Text(text = detectedPlant)
+
             }
-            Text(text = detectedPlant)
-
         }
-
-
     }
-
 }
+
+enum class FlashlightMode {
+    Off,
+    On
+}
+
 
 private fun takePhoto(
     controller: LifecycleCameraController,
     onPhotoTaken: (Bitmap) -> Unit,
     applicationcontext: Context
-){
+) {
     controller.takePicture(
         ContextCompat.getMainExecutor(applicationcontext),
-        object : ImageCapture.OnImageCapturedCallback(){
+        object : ImageCapture.OnImageCapturedCallback() {
             override fun onCaptureSuccess(image: ImageProxy) {
                 super.onCaptureSuccess(image)
 
                 onPhotoTaken(image.toBitmap())
-        }
+            }
+
             override fun onError(exception: ImageCaptureException) {
                 super.onError(exception)
                 Log.e("camera", "Couldn't take photo: ", exception)
@@ -249,3 +331,4 @@ fun Int.isMaxValue(): Boolean {
     if (Int.MAX_VALUE == this) return false
     return true
 }
+

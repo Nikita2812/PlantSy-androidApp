@@ -18,6 +18,9 @@ roomCommon = "2.6.1"
 roomCommonJvm = "2.7.0-alpha08"
 googleGmsGoogleServices = "4.4.2"
 firebaseFirestore = "25.1.1"
+gamesActivity = "3.0.5"
+leanback = "1.0.0"
+cronetEmbedded = "119.6045.31"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -43,6 +46,9 @@ tensorflow-lite-support = { module = "org.tensorflow:tensorflow-lite-support", v
 androidx-room-common = { group = "androidx.room", name = "room-common", version.ref = "roomCommon" }
 androidx-room-common-jvm = { group = "androidx.room", name = "room-common-jvm", version.ref = "roomCommonJvm" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+androidx-games-activity = { group = "androidx.games", name = "games-activity", version.ref = "gamesActivity" }
+androidx-leanback = { group = "androidx.leanback", name = "leanback", version.ref = "leanback" }
+cronet-embedded = { group = "org.chromium.net", name = "cronet-embedded", version.ref = "cronetEmbedded" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
