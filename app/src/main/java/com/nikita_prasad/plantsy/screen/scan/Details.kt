@@ -1,5 +1,6 @@
 package com.nikita_prasad.plantsy.screen.scan
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,24 +28,38 @@ fun DetailScreen(
     LaunchedEffect(true) {
         savePhotoviewModel.onClassify(context, plantIndex = plantIndex)
     }
-    val data = savePhotoviewModel.data.collectAsState().value
+    val nrmlBool = savePhotoviewModel.isNormalBoolean.collectAsState().value
+    val errBool = savePhotoviewModel.isErroredBoolean.collectAsState().value
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ){
-        Text(
-            text = "Result: $plantIndex",
-            fontSize = 24.sp
-        )
-        Image(
-            bitmap = bitmap.value!!.asImageBitmap(),
-            ""
-        )
-        Text(text = "Disease: ${data.disease_name}")
 
+    if (nrmlBool) {
+        Text("Plant is healthyth")
+    } else if (errBool) {
+        Text("Error")
+    } else {
+
+        val data = savePhotoviewModel.data.collectAsState().value
+
+        Log.d("res", data.toString())
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Result: $plantIndex",
+                fontSize = 24.sp
+            )
+            Image(
+                bitmap = bitmap.value!!.asImageBitmap(),
+                ""
+            )
+            Text(text = "Disease: ${data.disease_name}")
+
+        }
     }
+
 }

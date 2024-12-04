@@ -109,6 +109,10 @@ class ScanVM(application: Application): AndroidViewModel(application){
                 _reloadingBoolean.value = false
             } else {
                 findMaxConfidence()
+                Log.d(
+                    "dbSearchInput",
+                    "maxIndex: ${maxIndex.value.diseaseIndex.toLong()} \n plantIndex: $plantIndex"
+                )
                 _dataLoaded.value = _diseaseDBvm.getDiseaseData(
                     _maxIndex.value.diseaseIndex.toLong(),
                     plantIndex.toLong()
