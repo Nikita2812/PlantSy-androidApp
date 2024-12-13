@@ -12,7 +12,6 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,6 +32,8 @@ import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material.icons.outlined.FlashOff
 import androidx.compose.material.icons.outlined.FlashOn
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,7 +51,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -65,6 +65,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.nikita_prasad.plantsy.database.appDB.diseaseInfo.diseaseDBvm
 import com.nikita_prasad.plantsy.navigation.bottombar.NavItem
 import com.nikita_prasad.plantsy.screen.CameraPreview
+import com.nikita_prasad.plantsy.utils.dataclass.PlantNameIndexDC
 import com.nikita_prasad.plantsy.utils.viewmodel.ScanVM
 import com.nikita_prasad.plantsy.utils.viewmodel.analyzer
 
@@ -75,7 +76,7 @@ fun ScanScreen(
     paddingValues: PaddingValues,
     navController: NavHostController,
     scanVM: ScanVM,
-    diseaseDBvm: diseaseDBvm
+    diseaseDBvm: diseaseDBvm,
 ) {
     var cameraPermissionState: PermissionState =
         rememberPermissionState(permission = Manifest.permission.CAMERA)
@@ -138,7 +139,7 @@ fun ScanScreen(
     when (flashLightMode.value) {
         FlashlightMode.Off -> controller.cameraControl?.enableTorch(false)
         FlashlightMode.On -> controller.cameraControl?.enableTorch(true)
-    }  //update the flag upon click on the button
+    }
 
 
     Scaffold(
@@ -182,7 +183,6 @@ fun ScanScreen(
     )
 
     {
-
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -193,8 +193,7 @@ fun ScanScreen(
                     modalState.value = false
                 }) {
                     Column {
-                        bitmaps?.asImageBitmap()
-                            ?.let { Image(bitmap = it, contentDescription = null) }
+                        Text(text = detectedPlant)
                         Box(
                             modifier = Modifier
                                 .fillMaxSize(),
@@ -211,6 +210,11 @@ fun ScanScreen(
                                     }
                                 },
                                 text = "go to details"
+                            )
+                            PlantSwitchDropdown(
+                                onPlantIndexUpdate = { newIndex ->
+                                    plantIndex = newIndex
+                                }
                             )
                         }
                     }
@@ -298,6 +302,7 @@ fun ScanScreen(
     }
 }
 
+
 enum class FlashlightMode {
     Off,
     On
@@ -325,6 +330,51 @@ private fun takePhoto(
             }
         }
     )
+}
+
+@Composable
+fun PlantSwitchDropdown(
+    onPlantIndexUpdate: (Int) -> Unit
+) {
+    val plantDataList: List<PlantNameIndexDC> = listOf(
+        PlantNameIndexDC(1, "Apple"),
+        PlantNameIndexDC(2, "Bell pepper"),
+        PlantNameIndexDC(3, "Cherry"),
+        PlantNameIndexDC(4, "Citrus"),
+        PlantNameIndexDC(5, "Corn"),
+        PlantNameIndexDC(6, "Grape"),
+        PlantNameIndexDC(7, "Peach"),
+        PlantNameIndexDC(8, "Potato"),
+        PlantNameIndexDC(9, "Strawberry"),
+        PlantNameIndexDC(10, "Tomato")
+    )
+
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOption by remember { mutableStateOf("Select an option") }
+
+    Box {
+        Text(
+            text = selectedOption,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = true }
+        )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            plantDataList.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option.plantName) },
+                    onClick = {
+                        selectedOption = option.plantName
+                        onPlantIndexUpdate(option.plantIndex)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
 }
 
 fun Int.isMaxValue(): Boolean {

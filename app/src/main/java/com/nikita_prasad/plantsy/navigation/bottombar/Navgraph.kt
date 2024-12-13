@@ -71,10 +71,11 @@ fun Navgraph(
         }
 
         composable(route = NavItem.Scan.route) {
-            ScanScreen(paddingValues = paddingValues,
+            ScanScreen(
+                paddingValues = paddingValues,
                 navController = navController,
                 scanVM = savePhotoViewModel,
-                diseaseDBvm = diseaseDBVM
+                diseaseDBvm = diseaseDBVM,
             )
         }
 
