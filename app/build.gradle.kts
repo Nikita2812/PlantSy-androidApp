@@ -1,8 +1,9 @@
+
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
-    alias(libs.plugins.google.gms.google.services)
+    id("com.google.gms.google-services")
 }
 
 kapt {
@@ -11,14 +12,14 @@ kapt {
 
 android {
     namespace = "com.nikita_prasad.plantsy"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.nikita_prasad.plantsy"
-        minSdk = 24
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.9"
+        minSdk = 26
+        targetSdk = 35
+        versionCode = 42
+        versionName = "2025.01.15.03 (v1.8.12 Plant Sown)"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -41,18 +42,18 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
     buildFeatures {
         compose = true
         mlModelBinding = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
     packaging {
         resources {
@@ -63,74 +64,77 @@ android {
 
 dependencies {
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.navigation.runtime.ktx)
-    implementation(libs.firebase.firestore)
-    implementation(libs.androidx.games.activity)
-    implementation(libs.androidx.leanback)
-    implementation(libs.cronet.embedded)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
-    implementation("androidx.compose.material:material-icons-extended:1.6.6")
-    implementation("androidx.navigation:navigation-compose:2.7.2")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
-    implementation("androidx.compose.ui:ui-text-google-fonts:1.5.2")
-    implementation(libs.tensorflow.lite.support)
-    implementation(libs.tensorflow.lite.metadata)
-    implementation(libs.tensorflow.lite.gpu)
+    implementation("com.google.guava:guava:32.1.3-android")
+    implementation("androidx.core:core-ktx:1.15.0")
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("androidx.compose.material:material-icons-extended:1.7.5")
+    implementation("androidx.navigation:navigation-compose:2.8.4")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+    implementation("androidx.activity:activity-compose:1.9.3")
+    implementation(platform("androidx.compose:compose-bom:2024.11.00"))
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.7.5")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
+    implementation("org.tensorflow:tensorflow-lite-support:0.1.0")
+    implementation("org.tensorflow:tensorflow-lite-metadata:0.1.0")
+    implementation("org.tensorflow:tensorflow-lite-gpu:2.3.0")
+    implementation("com.google.firebase:firebase-firestore:25.1.1")
+    implementation("com.google.firebase:firebase-auth:23.1.0")
+    implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
+    implementation("com.google.firebase:firebase-database-ktx")
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.11.00"))
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    implementation("androidx.core:core-splashscreen:1.1.0-rc01")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
 
     //cameraX
-    val cameraxVersion = "1.3.0-rc01"
+    val cameraxVersion = "1.4.0"
     implementation("androidx.camera:camera-core:$cameraxVersion")
-    implementation("androidx.camera:camera-camera2:$cameraxVersion")
-    implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
-    implementation("androidx.camera:camera-video:$cameraxVersion")
-    implementation("androidx.camera:camera-view:$cameraxVersion")
-    implementation("androidx.camera:camera-extensions:$cameraxVersion")
-    implementation("com.google.accompanist:accompanist-permissions:0.32.0")
-    implementation(platform("androidx.compose:compose-bom:2023.06.01"))
-    implementation("io.coil-kt:coil-compose:2.4.0")
+implementation("androidx.camera:camera-camera2:$cameraxVersion")
+implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
+implementation("androidx.camera:camera-video:$cameraxVersion")
+implementation("androidx.camera:camera-view:$cameraxVersion")
+implementation("androidx.camera:camera-extensions:$cameraxVersion")
+implementation("com.google.accompanist:accompanist-permissions:0.32.0")
+implementation(platform("androidx.compose:compose-bom:2024.11.00"))
+implementation("io.coil-kt:coil-compose:2.4.0")
+implementation("com.google.mlkit:text-recognition:16.0.1")
 
-    // room
-    dependencies {
-        val room_version = "2.6.1"
+//viewmodel
+val arch_version = "2.8.7"
+implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$arch_version")
+implementation("androidx.lifecycle:lifecycle-runtime-ktx:$arch_version")
 
-        implementation("androidx.room:room-runtime:$room_version")
-        annotationProcessor("androidx.room:room-compiler:$room_version")
+// room db
+val roomVersion= "2.6.1"
+implementation("androidx.room:room-runtime:$roomVersion")
+annotationProcessor("androidx.room:room-compiler:$roomVersion")
+kapt("androidx.room:room-compiler:$roomVersion")
+implementation("androidx.room:room-ktx:$roomVersion")
+androidTestImplementation("androidx.room:room-testing:$roomVersion")
 
-        // To use Kotlin annotation processing tool (kapt)
-        kapt("androidx.room:room-compiler:$room_version")
+implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
-        // optional - Kotlin Extensions and Coroutines support for Room
-        implementation("androidx.room:room-ktx:$room_version")
+// credential manager
+implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
+implementation("androidx.credentials:credentials:1.3.0")
 
-        // optional - RxJava2 support for Room
-        implementation("androidx.room:room-rxjava2:$room_version")
-
-        // optional - RxJava3 support for Room
-        implementation("androidx.room:room-rxjava3:$room_version")
-
-        // optional - Guava support for Room, including Optional and ListenableFuture
-        implementation("androidx.room:room-guava:$room_version")
-
-        // optional - Test helpers
-        testImplementation("androidx.room:room-testing:$room_version")
-
-        // optional - Paging 3 Integration
-        implementation("androidx.room:room-paging:$room_version")
-        implementation("com.google.guava:guava:32.1.3-android")
-    }
+// onboardings
+implementation("androidx.datastore:datastore-preferences:1.1.1")
+implementation("androidx.compose.ui:ui:1.7.5")
+implementation("androidx.compose.material:material:1.7.5")
+implementation("androidx.activity:activity-compose:1.9.3")
 }

@@ -35,21 +35,21 @@ fun Navgraph(
     val versionName = context.packageManager.getPackageInfo(context.packageName, 0).versionName
 
     LaunchedEffect(true) {
-        val sharedPreferences =
-            context.getSharedPreferences("packageVersionName", Context.MODE_PRIVATE)
-        val versionNameSF = sharedPreferences.getString("packageVersionName", "null")
+       // val sharedPreferences =
+         //   context.getSharedPreferences("packageVersionName", Context.MODE_PRIVATE)
+      //  val versionNameSF = sharedPreferences.getString("packageVersionName", "null")
 
-        Log.d("pckge", "versionName: $versionName, versionNameSF: $versionNameSF")
+      //  Log.d("pckge", "versionName: $versionName, versionNameSF: $versionNameSF")
 
-        if (versionName != versionNameSF) {
-            Log.d("dbStatus", "triggered")
-            diseaseDBVM.fetchDiseaseData(
-                onCompletion = {
-                    sharedPreferences.edit().putString("packageVersionName", versionName).apply()
-                }
-            )
-            Log.d("dbStatus", "after fetch")
-        } else Log.d("dbStatus", "not triggered")
+       // if (versionName != versionNameSF) {
+        //    Log.d("dbStatus", "triggered")
+        //    diseaseDBVM.fetchDiseaseData(
+        //        onCompletion = {
+         //           sharedPreferences.edit().putString("packageVersionName", versionName).apply()
+         //       }
+         //   )
+       //     Log.d("dbStatus", "after fetch")
+     //   } else Log.d("dbStatus", "not triggered")
 
     }
 
