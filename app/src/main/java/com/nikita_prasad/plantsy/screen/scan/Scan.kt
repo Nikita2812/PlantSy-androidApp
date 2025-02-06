@@ -46,6 +46,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -95,7 +96,7 @@ fun ScanScreen(
     val context = LocalContext.current
     val applContext = context.applicationContext
     var plantIndex by remember {
-        mutableStateOf(Int.MAX_VALUE)
+        mutableIntStateOf(Int.MAX_VALUE)
     }
 
     var detectedPlant by remember { mutableStateOf("") }
@@ -104,7 +105,7 @@ fun ScanScreen(
         analyzer(
             context = context,
             a = {
-                plantIndex = it.toInt()
+                plantIndex = it
             }
         )
     }
@@ -125,6 +126,7 @@ fun ScanScreen(
     LaunchedEffect(plantIndex) {
         if (plantIndex != Int.MAX_VALUE) {
             detectedPlant = diseaseDBvm.getDomain(plantIndex.toLong())
+            Log.d("resultsPlant", "results: ${detectedPlant}\tindex: $plantIndex")
         }
     }
 

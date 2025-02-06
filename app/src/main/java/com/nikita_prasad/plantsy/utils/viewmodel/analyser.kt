@@ -15,39 +15,44 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 
 class analyzer(
     private val context: Context,
-    private val a: (String) -> Unit
+    private val a: (Int) -> Unit
 ): ImageAnalysis.Analyzer {
 
     private var frameSkipCounter= 0
 
     override fun analyze(image: ImageProxy) {
-        if (frameSkipCounter%60==0){
-            val matrix = Matrix().apply{
-                postRotate(image.imageInfo.rotationDegrees.toFloat())
+        try {
+            if (frameSkipCounter%60==0){
+                val matrix = Matrix().apply{
+                    postRotate(image.imageInfo.rotationDegrees.toFloat())
+                }
+                val rotatedBitmap = Bitmap.createBitmap(
+                    image.toBitmap(),
+                    0,
+                    0,
+                    image.width,
+                    image.height,
+                    matrix,
+                    true
+                )
+                var tensorImage= TensorImage(DataType.FLOAT32)
+                tensorImage.load(rotatedBitmap)
+                val imageProcessor= ImageProcessor.Builder()
+                    .add(ResizeOp(256,256, ResizeOp.ResizeMethod.BILINEAR))
+                    .build()
+                tensorImage= imageProcessor.process(tensorImage)
+                val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 256, 256, 3), DataType.FLOAT32)
+                inputFeature0.loadBuffer(tensorImage.buffer)
+                val outputFeature0 = MainClassifier.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer
+                Log.d("analyzerResults", getMaxIndex(outputFeature0.floatArray).toString())
+                a(getMaxIndex(outputFeature0.floatArray))
             }
-            val rotatedBitmap = Bitmap.createBitmap(
-                image.toBitmap(),
-                0,
-                0,
-                image.width,
-                image.height,
-                matrix,
-                true
-            )
-            var tensorImage= TensorImage(DataType.FLOAT32)
-            tensorImage.load(rotatedBitmap)
-            val imageProcessor= ImageProcessor.Builder()
-                .add(ResizeOp(256,256, ResizeOp.ResizeMethod.BILINEAR))
-                .build()
-            tensorImage= imageProcessor.process(tensorImage)
-            val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 256, 256, 3), DataType.FLOAT32)
-            inputFeature0.loadBuffer(tensorImage.buffer)
-            val outputFeature0 = MainClassifier.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer
-            Log.d("analyzerResults", getMaxIndex(outputFeature0.floatArray).toString())
-            a(getMaxIndex(outputFeature0.floatArray).toString())
+            frameSkipCounter++
+        } catch (e: Exception){
+            Log.d("imageProcessing", "error in processing image")
+        } finally {
+            image.close()
         }
-        frameSkipCounter++
-        image.close()
     }
 
     private  fun getMaxIndex(arr: FloatArray?): Int{
