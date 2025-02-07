@@ -201,6 +201,14 @@ fun ScanScreen(
                                 .fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
+
+                            PlantSwitchDropdown(
+                                onPlantIndexUpdate = { newIndex ->
+                                    plantIndex = newIndex
+                                },
+                                diseaseDBvm = diseaseDBvm
+                            )
+
                             Text(
                                 modifier = Modifier.clickable {
                                     if (plantIndex.isMaxValue()) {
@@ -212,11 +220,6 @@ fun ScanScreen(
                                     }
                                 },
                                 text = "go to details"
-                            )
-                            PlantSwitchDropdown(
-                                onPlantIndexUpdate = { newIndex ->
-                                    plantIndex = newIndex
-                                }
                             )
                         }
                     }
@@ -336,7 +339,8 @@ private fun takePhoto(
 
 @Composable
 fun PlantSwitchDropdown(
-    onPlantIndexUpdate: (Int) -> Unit
+    onPlantIndexUpdate: (Int) -> Unit,
+    diseaseDBvm: diseaseDBvm
 ) {
     val plantDataList: List<PlantNameIndexDC> = listOf(
         PlantNameIndexDC(1, "Apple"),

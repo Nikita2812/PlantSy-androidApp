@@ -3,9 +3,11 @@ package com.nikita_prasad.plantsy.database.appDB.diseaseInfo
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.nikita_prasad.plantsy.database.appDB.appDataDB
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class diseaseDBvm(application: Application): AndroidViewModel(application) {
@@ -65,6 +67,17 @@ class diseaseDBvm(application: Application): AndroidViewModel(application) {
                 e.toString()
             )
         }
+    }
+
+    fun updateSelectedPlant(plantIndex: Long, plantName: String) {
+        viewModelScope.launch {
+            try {
+                Log.d("PlantSelection", "Updated plant: $plantName (Index: $plantIndex)")
+            }catch (e: Exception) {
+                Log.e("PlantSelection", "Error updating plant", e)
+            }
+        }
+
     }
 }
 
