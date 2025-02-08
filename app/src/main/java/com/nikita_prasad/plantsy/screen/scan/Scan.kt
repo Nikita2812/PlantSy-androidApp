@@ -100,13 +100,15 @@ fun ScanScreen(
     }
 
     var detectedPlant by remember { mutableStateOf("") }
+    val modalState = remember { mutableStateOf(false) }
 
     val analyzer = remember {
         analyzer(
             context = context,
             a = {
                 plantIndex = it
-            }
+            },
+            isAllowed = {!modalState.value}
         )
     }
 
@@ -132,9 +134,7 @@ fun ScanScreen(
 
     val bitmaps by scanVM.bitmaps.collectAsState()
     val applicationcontext = LocalContext.current.applicationContext
-    val modalState = remember {
-        mutableStateOf(false)
-    }
+
     val flashLightMode = remember {
         mutableStateOf(FlashlightMode.Off)
     }

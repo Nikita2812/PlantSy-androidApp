@@ -15,14 +15,16 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 
 class analyzer(
     private val context: Context,
-    private val a: (Int) -> Unit
+    private val a: (Int) -> Unit,
+    private val isAllowed: () -> Boolean
 ): ImageAnalysis.Analyzer {
 
     private var frameSkipCounter= 0
 
     override fun analyze(image: ImageProxy) {
         try {
-            if (frameSkipCounter%60==0){
+            if (frameSkipCounter%60==0 && isAllowed()){
+                Log.d("analyzerResults","isAllowed: $isAllowed")
                 val matrix = Matrix().apply{
                     postRotate(image.imageInfo.rotationDegrees.toFloat())
                 }
