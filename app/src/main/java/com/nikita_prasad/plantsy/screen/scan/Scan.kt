@@ -343,16 +343,16 @@ fun PlantSwitchDropdown(
     diseaseDBvm: diseaseDBvm
 ) {
     val plantDataList: List<PlantNameIndexDC> = listOf(
-        PlantNameIndexDC(1, "Apple"),
-        PlantNameIndexDC(2, "Bell pepper"),
-        PlantNameIndexDC(3, "Cherry"),
-        PlantNameIndexDC(4, "Citrus"),
-        PlantNameIndexDC(5, "Corn"),
-        PlantNameIndexDC(6, "Grape"),
-        PlantNameIndexDC(7, "Peach"),
-        PlantNameIndexDC(8, "Potato"),
-        PlantNameIndexDC(9, "Strawberry"),
-        PlantNameIndexDC(10, "Tomato")
+        PlantNameIndexDC(0, "Apple"),
+        PlantNameIndexDC(1, "Bell pepper"),
+        PlantNameIndexDC(2, "Cherry"),
+        PlantNameIndexDC(3, "Citrus"),
+        PlantNameIndexDC(4, "Corn"),
+        PlantNameIndexDC(5, "Grape"),
+        PlantNameIndexDC(6, "Peach"),
+        PlantNameIndexDC(7, "Potato"),
+        PlantNameIndexDC(8, "Strawberry"),
+        PlantNameIndexDC(9, "Tomato")
     )
 
     var expanded by remember { mutableStateOf(false) }
@@ -375,6 +375,7 @@ fun PlantSwitchDropdown(
                     onClick = {
                         selectedOption = option.plantName
                         onPlantIndexUpdate(option.plantIndex)
+                        diseaseDBvm.updateSelectedPlant(option.plantIndex.toLong(),option.plantName)
                         expanded = false
                     }
                 )
