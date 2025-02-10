@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -67,7 +68,7 @@ fun Navgraph(
         }
 
         composable(route = NavItem.Community.route) {
-            CommunityScreen()
+            CommunityScreen(modifier = Modifier)
         }
 
         composable(route = NavItem.Scan.route) {
