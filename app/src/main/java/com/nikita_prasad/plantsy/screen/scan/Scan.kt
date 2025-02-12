@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -92,13 +93,20 @@ fun ScanScreen(
         mutableStateOf<Uri?>(null)
     }
     val modalState = remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
-            Log.d("ImagePicker", "Selected URI: $uri")
-            selectedImageUri = uri
-            modalState.value = true}
+           uri?.let {selectedUri ->
+               val bitmap = MediaStore.Images.Media.getBitmap(
+                   context.contentResolver,
+                   selectedUri
+               )
+               scanVM.onTakePhoto(bitmap)
+               modalState.value = true
+           }
+        }
     )
 
     if (cameraPermissionState.status.isGranted) {
@@ -112,7 +120,7 @@ fun ScanScreen(
         )
     }
 
-    val context = LocalContext.current
+
     val applContext = context.applicationContext
     var plantIndex by remember {
         mutableIntStateOf(Int.MAX_VALUE)
