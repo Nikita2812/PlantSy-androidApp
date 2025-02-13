@@ -77,7 +77,6 @@ import com.nikita_prasad.plantsy.utils.dataclass.PlantNameIndexDC
 import com.nikita_prasad.plantsy.utils.viewmodel.ScanVM
 import com.nikita_prasad.plantsy.utils.viewmodel.analyzer
 
-
 @SuppressLint("RememberReturnType", "UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -85,7 +84,7 @@ fun ScanScreen(
     paddingValues: PaddingValues,
     navController: NavHostController,
     scanVM: ScanVM,
-    diseaseDBvm: diseaseDBvm,
+    diseaseDBvm: diseaseDBvm
 ) {
     var cameraPermissionState: PermissionState =
         rememberPermissionState(permission = Manifest.permission.CAMERA)
@@ -95,6 +94,10 @@ fun ScanScreen(
     val modalState = remember { mutableStateOf(false) }
     val context = LocalContext.current
 
+    var plantIndex by remember {
+        mutableIntStateOf(Int.MAX_VALUE)
+    }
+
     val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
@@ -103,7 +106,7 @@ fun ScanScreen(
                    context.contentResolver,
                    selectedUri
                )
-               scanVM.onTakePhoto(bitmap)
+               plantIndex = scanVM.classify(context, bitmap, 99)
                modalState.value = true
            }
         }
@@ -122,9 +125,6 @@ fun ScanScreen(
 
 
     val applContext = context.applicationContext
-    var plantIndex by remember {
-        mutableIntStateOf(Int.MAX_VALUE)
-    }
 
     var detectedPlant by remember { mutableStateOf("") }
 
@@ -316,7 +316,8 @@ fun ScanScreen(
                                 scanVM.onTakePhoto(it)
                                 modalState.value = true
                             },
-                            applicationcontext = applicationcontext
+                            applicationcontext = applicationcontext,
+                            scanVM = scanVM
                         )
                     }
                 )
@@ -358,15 +359,17 @@ enum class FlashlightMode {
 private fun takePhoto(
     controller: LifecycleCameraController,
     onPhotoTaken: (Bitmap) -> Unit,
-    applicationcontext: Context
+    applicationcontext: Context,
+    scanVM: ScanVM
 ) {
     controller.takePicture(
         ContextCompat.getMainExecutor(applicationcontext),
         object : ImageCapture.OnImageCapturedCallback() {
             override fun onCaptureSuccess(image: ImageProxy) {
                 super.onCaptureSuccess(image)
+                val bitmap = image.toBitmap()
+                onPhotoTaken(bitmap)
 
-                onPhotoTaken(image.toBitmap())
             }
 
             override fun onError(exception: ImageCaptureException) {

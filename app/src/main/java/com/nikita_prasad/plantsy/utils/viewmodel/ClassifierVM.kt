@@ -9,6 +9,7 @@ import com.nikita_prasad.plantsy.ml.AppleBlackRot
 import com.nikita_prasad.plantsy.ml.AppleScab
 import com.nikita_prasad.plantsy.ml.CedarAppleRust
 import com.nikita_prasad.plantsy.ml.Cherry
+import com.nikita_prasad.plantsy.ml.MainClassifier
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
@@ -38,6 +39,7 @@ class ClassifierVM: ViewModel() {
 
         predictedClasses = when (result) {
             0 -> { predictionApple(inputFeature0 = inputFeature0, context = context) }
+            99 -> {predictionMainClassifier(inputFeature0 = inputFeature0, context = context)}
             //1 -> { predictionBellPepper(inputFeature0 = inputFeature0, context = context)}
             else -> { predictionApple(inputFeature0 = inputFeature0, context = context) }
         }
@@ -148,6 +150,21 @@ class ClassifierVM: ViewModel() {
                 outputcitrus.floatArray[maxIndexcitrus] * 100,
                 0
             )
+        )
+        return predictedClass
+    }
+    private fun predictionMainClassifier(
+        context: Context,
+        inputFeature0: TensorBuffer
+    ): List<Classification> {
+        val predictedClass = mutableListOf<Classification>()
+        val outputMain = MainClassifier
+            .newInstance(context)
+            .process(inputFeature0)
+            .outputFeature0AsTensorBuffer
+        val maxIndexMain = getMaxIndex(outputMain.floatArray)
+        predictedClass.add(
+            Classification(maxIndexMain, outputMain.floatArray[maxIndexMain]*100, 0)
         )
         return predictedClass
     }

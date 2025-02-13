@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.nikita_prasad.plantsy.database.appDB.diseaseInfo.DiseaseDC
@@ -16,6 +17,8 @@ class ScanVM(application: Application): AndroidViewModel(application){
 
     private val _bitmaps = MutableStateFlow<Bitmap?>(null)
     var bitmaps = _bitmaps.asStateFlow()
+
+    private val classifierVM = ClassifierVM()
 
     fun onTakePhoto(bitmap: Bitmap){
         _bitmaps.value = bitmap
@@ -136,6 +139,10 @@ class ScanVM(application: Application): AndroidViewModel(application){
         }
         _maxIndex.value = highestConfidenceDisease
         Log.d("filteredData", "after: $highestConfidenceDisease")
+    }
+
+    fun classify(context: Context, bitmap: Bitmap, result: Int): Int {
+        return classifierVM.classify(context, bitmap, result)[0].index
     }
 
 }
