@@ -21,6 +21,8 @@ firebaseFirestore = "25.1.1"
 gamesActivity = "3.0.5"
 leanback = "1.0.0"
 cronetEmbedded = "119.6045.31"
+material = "1.12.0"
+recyclerview = "1.4.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -49,6 +51,8 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 androidx-games-activity = { group = "androidx.games", name = "games-activity", version.ref = "gamesActivity" }
 androidx-leanback = { group = "androidx.leanback", name = "leanback", version.ref = "leanback" }
 cronet-embedded = { group = "org.chromium.net", name = "cronet-embedded", version.ref = "cronetEmbedded" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

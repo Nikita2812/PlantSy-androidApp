@@ -27,13 +27,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.nikita_prasad.plantsy.database.userDB.chatbotDB.chatDB_VM
+import com.nikita_prasad.plantsy.database.userDB.chatbotDB.chatEntity
+import com.nikita_prasad.plantsy.database.userDB.chatbotDB.messageEntity
 import com.nikita_prasad.plantsy.screen.chatbot.chatbot_dc
 import com.nikita_prasad.plantsy.utils.viewmodel.ChatVM
 import kotlinx.coroutines.launch
 
+
 @Composable
 fun ChatbotScreen(modifier: Modifier = Modifier) {
     val chatVM: ChatVM = viewModel()
+    val chatDB_VM: chatDB_VM = viewModel()
     val coroutineScope = rememberCoroutineScope()
 
     // State for user input and chat history
@@ -85,6 +90,29 @@ fun ChatbotScreen(modifier: Modifier = Modifier) {
 
                         Log.d("ChatbotScreen", "Sending message: $messageToSend")
 
+                        // For user message
+                        coroutineScope.launch {
+                            val userChatEntity = chatEntity(
+                                id = 0,
+                                timestamp = System.currentTimeMillis(),
+                                userIndex = 1,
+                                mode = "chat"
+                            )
+                            val chatId = chatDB_VM.addChat(userChatEntity)
+
+                            // Now add the message
+                            val userMessageEntity = messageEntity(
+                                id = 0, // Auto-generated
+                                message = messageToSend,
+                                isBotMessage = false, // User message
+                                timestamp = System.currentTimeMillis(),
+                                isError = false,
+                                chatId = chatId.toString(), // This is important
+                                hasAttachments = false,
+                                isSearchEnabled = false
+                            )
+                            chatDB_VM.addMessages(userMessageEntity)
+                        }
                         userInput = ""
 
                         coroutineScope.launch {
@@ -93,15 +121,41 @@ fun ChatbotScreen(modifier: Modifier = Modifier) {
                                 onSuccess = { result ->
                                     response = result
                                     isLoading = false
-                                    Log.d("response", "Received chatbot message: $result")
-                                },
-                                onError = { error ->
-                                    response.message = "Error: $error"
-                                    isLoading = false
-                                    Log.d("response", "Error: $error")
-                                },
-                                mode = 0,
-                                isSearchEnabled = false
+                                    Log.d("response", "Received chatbot message: ${result.message}")
+
+                                    // Create a chatEntity for the bot response
+                                    result.message?.let { botMessage ->
+                                        val botChatEntity = chatEntity(
+                                            id = 0,
+                                        timestamp = System.currentTimeMillis(),
+                                            mode = "0",
+                                            userIndex = 0
+                                        )
+                                        Log.d("response","received bot message: $botMessage")
+                                             coroutineScope.launch {
+                                                 val botChatId = chatDB_VM.addChat(botChatEntity)
+
+                                                 val botMessageEntity = messageEntity(
+                                                     id = 0, // Auto-generated
+                                                     message = botMessage,
+                                                     isBotMessage = true, // Bot message
+                                                     timestamp = System.currentTimeMillis(),
+                                                     isError = false,
+                                                     chatId = botChatId.toString(), // This is important
+                                                     hasAttachments = false,
+                                                     isSearchEnabled = false// The bot response message
+                                                 )
+                                                 chatDB_VM.addMessages(botMessageEntity)
+                                                }
+                                             }
+                                         },
+                onError = { error ->
+                    response.message = "Error: $error"
+                    isLoading = false
+                    Log.d("response", "Error: $error")
+                },
+                mode = 0,
+                isSearchEnabled = false
                             )
                         }
                     }

@@ -1,6 +1,7 @@
 package com.nikita_prasad.plantsy.database.userDB.chatbotDB
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -10,8 +11,11 @@ import androidx.room.RoomDatabase
     entities = [
          chatEntity::class, messageEntity::class
     ],
-    version = 6,
-    exportSchema = true
+    version = 7,
+    exportSchema = true,
+    autoMigrations = [
+        AutoMigration(from = 6, to = 7)
+    ]
 )
 abstract class userDB: RoomDatabase() {
 

@@ -9,7 +9,10 @@ import androidx.room.Transaction
 @Dao
 interface chatDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addChat(chatEntity: chatEntity)
+    suspend fun addChat(chatEntity: chatEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addMessages(messageEntity: messageEntity)
 
     @Query("select * from chats order by timestamp desc")
     suspend fun readChats(): List<chatEntity>

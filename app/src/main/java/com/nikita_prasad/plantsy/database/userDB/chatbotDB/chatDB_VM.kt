@@ -3,6 +3,7 @@ package com.nikita_prasad.plantsy.database.userDB.chatbotDB
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -10,48 +11,41 @@ class chatDB_VM(application: Application): AndroidViewModel(application) {
 
     private val repo: chatRepo
     private val dao: chatDAO
-    private val messagesDA0: messageDAO
-
+    private val messagesDAO: messageDAO
     init {
         dao = userDB.getUserDBRefence(application).chatDAO()
-        messagesDA0 = userDB.getUserDBRefence(application).messageDAO()
-        repo = chatRepo(dao, messagesDA0)
+        messagesDAO = userDB.getUserDBRefence(application).messageDAO()
+        repo = chatRepo(dao, messagesDAO)
     }
-
-    suspend fun addChat(chatEntity: chatEntity){
-        viewModelScope.launch {
+    suspend fun addChat(chatEntity: chatEntity) {
+        return withContext(Dispatchers.IO) {
             repo.addChat(chatEntity)
         }
     }
-
-    suspend fun addMessages(messageEntity: messageEntity){
-        viewModelScope.launch {
+    suspend fun addMessages(messageEntity: messageEntity) {
+        return withContext(Dispatchers.IO) {
             repo.addMessages(messageEntity)
         }
     }
-
     suspend fun readChatHistory(): List<chatEntity> {
-        return withContext(viewModelScope.coroutineContext){
+        return withContext(Dispatchers.IO) {
             repo.readChatHistory()
         }
     }
-
-    suspend fun getChatCounts(): Int{
-        return withContext(viewModelScope.coroutineContext){
+    suspend fun getChatCounts(): Int {
+        return withContext(Dispatchers.IO) {
             repo.getChatCount()
         }
     }
-
-    suspend fun readChatWithMessages(chatid: Int): List<chatWithMessage>{
-        return withContext(viewModelScope.coroutineContext){
-            repo.readChats(chatid)
+    suspend fun readChatWithMessages(chatId: Int): List<chatWithMessage> {
+        return withContext(Dispatchers.IO) {
+            repo.readChats(chatId)
         }
     }
 
-    suspend fun deleteChats(userIndex: Int){
-        viewModelScope.launch {
+    suspend fun deleteChats(userIndex: Int) {
+        withContext(Dispatchers.IO) {
             repo.deleteChatwMessage(userIndex)
         }
     }
-
 }

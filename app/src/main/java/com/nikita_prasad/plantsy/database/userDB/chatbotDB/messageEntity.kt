@@ -13,8 +13,8 @@ data class messageEntity(@PrimaryKey(autoGenerate = true)
                          val isBotMessage: Boolean,
                          val timestamp: Long,
                          val isError: Boolean,
-                         val chatId: Int,
-                         @ColumnInfo(name = "hasAttachments", defaultValue = "0")
-                         val hasAttachments: Long= 0L, // contains timestamp as foreign key for retrieving scan_history data
+                         val chatId: String,
+                         @ColumnInfo(name = "hasAttachments", defaultValue = "false")
+                         val hasAttachments: Boolean = false, // contains timestamp as foreign key for retrieving scan_history data
                          @ColumnInfo(name = "isSearchEnabled", defaultValue = "false")
                          val isSearchEnabled: Boolean= false)
