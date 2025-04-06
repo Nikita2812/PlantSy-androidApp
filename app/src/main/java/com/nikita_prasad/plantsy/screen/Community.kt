@@ -40,6 +40,36 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CommunityScreen(
+    modifier: Modifier = Modifier
+) {
+    var inputValue by remember { mutableStateOf("0") }
+    var indicatorValue by remember { mutableStateOf(0) }
+    val maxIndicatorValue = 100
+
+    Column(
+        modifier = modifier.padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularMeter(
+            indicatorValue = indicatorValue,
+            maxIndicatorValue = maxIndicatorValue,
+            canvasSize = 300.dp,
+            backgroundIndicatorColor = MaterialTheme.colors.onSurface.copy(alpha = 0.1f),
+            backgroundIndicatorStrokeWidth = 100f,
+            foregroundIndicatorColor = MaterialTheme.colors.primary,
+            foregroundIndicatorStrokeWidth = 100f,
+            bigTextFontSize = MaterialTheme.typography.h3.fontSize,
+            bigTextColor = MaterialTheme.colors.onSurface,
+            bigTextSuffix = "GB",
+            smallText = "Remaining",
+            smallTextFontSize = MaterialTheme.typography.h6.fontSize,
+            smallTextColor = MaterialTheme.colors.onSurface.copy(alpha = 0.3f)
+        )
+    }
+}
+
+@Composable
+fun CircularMeter(
     modifier: Modifier = Modifier,
     canvasSize: Dp = 300.dp,
     indicatorValue: Int = 0,
@@ -55,8 +85,7 @@ fun CommunityScreen(
     smallText: String = "Remaining",
     smallTextFontSize: TextUnit = MaterialTheme.typography.h6.fontSize,
     smallTextColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.3f)
-) {
-
+){
     var inputValue by remember { mutableStateOf("0") }
 
     var indicatorValue by remember { mutableStateOf(0) }
@@ -227,5 +256,5 @@ fun EmbeddedElements(
 @Composable
 @Preview(showBackground = true)
 fun CustomComponentPreview() {
-    CommunityScreen()
+    CircularMeter()
 }
