@@ -2,25 +2,13 @@ package com.nikita_prasad.plantsy.screen
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -31,72 +19,190 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
+
+data class SensorData(
+    val temperature: Double,
+    val humidity: Double,
+    val moisture: Double,
+    val heatIndex: Double,
+    val lightlux: Double
+)
+
+// 2. Gson serializable data class with annotations
+data class SerializableSensorData(
+    val temperature: Double,
+    val humidity: Double,
+    val moisture: Double,
+    @SerializedName("heat_index") val heatIndex: Double,
+    val lightlux: Double
+) {
+    // Converter function to domain model
+    fun toSensorData(): SensorData = SensorData(
+        temperature = temperature,
+        humidity = humidity,
+        moisture = moisture,
+        heatIndex = heatIndex,
+        lightlux = lightlux
+    )
+}
+
+private val sensorJsonData = """{"temperature": 21, "humidity": 54, "moisture": 43, "heat_index": 32, "lightlux": 540}"""
 
 @Composable
 fun CommunityScreen(
     modifier: Modifier = Modifier
 ) {
-    var inputValue by remember { mutableStateOf("0") }
-    var indicatorValue by remember { mutableStateOf(0) }
-    val maxIndicatorValue = 100
+    // Use Gson for JSON parsing
+    val gson = Gson()
+
+    // Parse JSON data using Gson and convert to domain model
+    val sensorData = remember {
+        gson.fromJson(sensorJsonData, SerializableSensorData::class.java).toSensorData()
+    }
+
+    // Define parameters for each meter
+    val meterConfigs = listOf(
+        MeterConfig(
+            value = sensorData.temperature,
+            maxValue = 50, // Assuming max temperature is 50°C
+            title = "Temperature",
+            suffix = "°C",
+            color = Color(0xFFFF6B6B) // Red shade for temperature
+        ),
+        MeterConfig(
+            value = sensorData.humidity,
+            maxValue = 100, // Humidity is percentage
+            title = "Humidity",
+            suffix = "%",
+            color = Color(0xFF4ECDC4) // Teal shade for humidity
+        ),
+        MeterConfig(
+            value = sensorData.moisture,
+            maxValue = 100, // Moisture as percentage
+            title = "Moisture",
+            suffix = "%",
+            color = Color(0xFF1A535C) // Darker teal for moisture
+        ),
+        MeterConfig(
+            value = sensorData.heatIndex,
+            maxValue = 60, // Assuming max heat index is 60°C
+            title = "Heat Index",
+            suffix = "°C",
+            color = Color(0xFFFF9F1C) // Orange for heat index
+        ),
+        MeterConfig(
+            value = sensorData.lightlux,
+            maxValue = 1000, // Assuming max light is 1000 lux
+            title = "Light",
+            suffix = "lx",
+            color = Color(0xFFFFD166) // Yellow for light
+        )
+    )
 
     Column(
-        modifier = modifier.padding(16.dp),
+        modifier = modifier
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        CircularMeter(
-            indicatorValue = indicatorValue,
-            maxIndicatorValue = maxIndicatorValue,
-            canvasSize = 300.dp,
-            backgroundIndicatorColor = MaterialTheme.colors.onSurface.copy(alpha = 0.1f),
-            backgroundIndicatorStrokeWidth = 100f,
-            foregroundIndicatorColor = MaterialTheme.colors.primary,
-            foregroundIndicatorStrokeWidth = 100f,
-            bigTextFontSize = MaterialTheme.typography.h3.fontSize,
-            bigTextColor = MaterialTheme.colors.onSurface,
-            bigTextSuffix = "GB",
-            smallText = "Remaining",
-            smallTextFontSize = MaterialTheme.typography.h6.fontSize,
-            smallTextColor = MaterialTheme.colors.onSurface.copy(alpha = 0.3f)
+        Text(
+            text = "Plant Sensor Dashboard",
+            style = MaterialTheme.typography.h5,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
         )
+
+        for (i in meterConfigs.indices step 2) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                // First meter in the row
+                CircularMeter(
+                    modifier = Modifier.weight(1f),
+                    indicatorValue = meterConfigs[i].value,
+                    maxIndicatorValue = meterConfigs[i].maxValue,
+                    canvasSize = 160.dp,
+                    backgroundIndicatorColor = MaterialTheme.colors.onSurface.copy(alpha = 0.1f),
+                    backgroundIndicatorStrokeWidth = 40f,
+                    foregroundIndicatorColor = meterConfigs[i].color,
+                    foregroundIndicatorStrokeWidth = 40f,
+                    bigTextFontSize = MaterialTheme.typography.h6.fontSize,
+                    bigTextColor = MaterialTheme.colors.onSurface,
+                    bigTextSuffix = meterConfigs[i].suffix,
+                    smallText = meterConfigs[i].title,
+                    smallTextFontSize = MaterialTheme.typography.body1.fontSize,
+                    smallTextColor = MaterialTheme.colors.onSurface.copy(alpha = 0.7f)
+                )
+
+                // Second meter in the row (if available)
+                if (i + 1 < meterConfigs.size) {
+                    CircularMeter(
+                        modifier = Modifier.weight(1f),
+                        indicatorValue = meterConfigs[i + 1].value,
+                        maxIndicatorValue = meterConfigs[i + 1].maxValue,
+                        canvasSize = 160.dp,
+                        backgroundIndicatorColor = MaterialTheme.colors.onSurface.copy(alpha = 0.1f),
+                        backgroundIndicatorStrokeWidth = 40f,
+                        foregroundIndicatorColor = meterConfigs[i + 1].color,
+                        foregroundIndicatorStrokeWidth = 40f,
+                        bigTextFontSize = MaterialTheme.typography.h6.fontSize,
+                        bigTextColor = MaterialTheme.colors.onSurface,
+                        bigTextSuffix = meterConfigs[i + 1].suffix,
+                        smallText = meterConfigs[i + 1].title,
+                        smallTextFontSize = MaterialTheme.typography.body1.fontSize,
+                        smallTextColor = MaterialTheme.colors.onSurface.copy(alpha = 0.7f)
+                    )
+                } else {
+                    // Empty space to maintain layout if there's an odd number of meters
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
+        }
     }
 }
+
+data class MeterConfig(
+    val value: Double,
+    val maxValue: Int,
+    val title: String,
+    val suffix: String,
+    val color: Color
+)
 
 @Composable
 fun CircularMeter(
     modifier: Modifier = Modifier,
     canvasSize: Dp = 300.dp,
-    indicatorValue: Int = 0,
+    indicatorValue: Double = 0.0,
     maxIndicatorValue: Int = 100,
     backgroundIndicatorColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.1f),
     backgroundIndicatorStrokeWidth: Float = 100f,
     foregroundIndicatorColor: Color = MaterialTheme.colors.primary,
     foregroundIndicatorStrokeWidth: Float = 100f,
-    // indicatorStrokeCap: StrokeCap = StrokeCap.Round,
     bigTextFontSize: TextUnit = MaterialTheme.typography.h3.fontSize,
     bigTextColor: Color = MaterialTheme.colors.onSurface,
-    bigTextSuffix: String = "GB",
-    smallText: String = "Remaining",
+    bigTextSuffix: String = "",
+    smallText: String = "",
     smallTextFontSize: TextUnit = MaterialTheme.typography.h6.fontSize,
     smallTextColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.3f)
-){
-    var inputValue by remember { mutableStateOf("0") }
-
-    var indicatorValue by remember { mutableStateOf(0) }
-
+) {
     var allowedIndicatorValue by remember {
-        mutableStateOf(maxIndicatorValue)
+        mutableStateOf(maxIndicatorValue.toDouble())
     }
     allowedIndicatorValue = if (indicatorValue <= maxIndicatorValue) {
         indicatorValue
     } else {
-        maxIndicatorValue
+        maxIndicatorValue.toDouble()
     }
 
     var animatedIndicatorValue by remember { mutableStateOf(0f) }
@@ -112,13 +218,13 @@ fun CircularMeter(
         animationSpec = tween(1000)
     )
 
-    val receivedValue by animateIntAsState(
-        targetValue = allowedIndicatorValue,
+    val receivedValue by animateFloatAsState(
+        targetValue = allowedIndicatorValue.toFloat(),
         animationSpec = tween(1000)
     )
 
     val animatedBigTextColor by animateColorAsState(
-        targetValue = if (allowedIndicatorValue == 0)
+        targetValue = if (allowedIndicatorValue == 0.0)
             MaterialTheme.colors.onSurface.copy(alpha = 0.3f)
         else
             bigTextColor,
@@ -126,58 +232,34 @@ fun CircularMeter(
     )
 
     Column(
-        modifier = modifier.padding(16.dp),
+        modifier = modifier
+            .size(canvasSize)
+            .drawBehind {
+                val componentSize = size / 1.25f
+                backgroundIndicator(
+                    componentSize = componentSize,
+                    indicatorColor = backgroundIndicatorColor,
+                    indicatorStrokeWidth = backgroundIndicatorStrokeWidth,
+                )
+                foregroundIndicator(
+                    sweepAngle = sweepAngle,
+                    componentSize = componentSize,
+                    indicatorColor = foregroundIndicatorColor,
+                    indicatorStrokeWidth = foregroundIndicatorStrokeWidth,
+                )
+            },
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Input Text Field
-        OutlinedTextField(
-            value = inputValue,
-            onValueChange = { newValue ->
-                // Only accept numeric input
-                if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
-                    inputValue = newValue
-                    // Update the indicator value
-                    indicatorValue = newValue.toIntOrNull() ?: 0
-                }
-            },
-            label = { Text("Enter value (0-$maxIndicatorValue)") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth()
+        EmbeddedElements(
+            bigText = receivedValue.toDouble(),
+            bigTextFontSize = bigTextFontSize,
+            bigTextColor = animatedBigTextColor,
+            bigTextSuffix = bigTextSuffix,
+            smallText = smallText,
+            smallTextColor = smallTextColor,
+            smallTextFontSize = smallTextFontSize
         )
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Column(
-            modifier = modifier
-                .size(canvasSize)
-                .drawBehind {
-                    val componentSize = size / 1.25f
-                    backgroundIndicator(
-                        componentSize = componentSize,
-                        indicatorColor = backgroundIndicatorColor,
-                        indicatorStrokeWidth = backgroundIndicatorStrokeWidth,
-                        // indicatorStokeCap = indicatorStrokeCap
-                    )
-                    foregroundIndicator(
-                        sweepAngle = sweepAngle,
-                        componentSize = componentSize,
-                        indicatorColor = foregroundIndicatorColor,
-                        indicatorStrokeWidth = foregroundIndicatorStrokeWidth,
-                        // indicatorStokeCap = indicatorStrokeCap
-                    )
-                },
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            EmbeddedElements(
-                bigText = receivedValue,
-                bigTextFontSize = bigTextFontSize,
-                bigTextColor = animatedBigTextColor,
-                bigTextSuffix = bigTextSuffix,
-                smallText = smallText,
-                smallTextColor = smallTextColor,
-                smallTextFontSize = smallTextFontSize
-            )
-        }
     }
 }
 
@@ -185,7 +267,6 @@ fun DrawScope.backgroundIndicator(
     componentSize: Size,
     indicatorColor: Color,
     indicatorStrokeWidth: Float,
-    // indicatorStokeCap: StrokeCap
 ) {
     drawArc(
         size = componentSize,
@@ -209,7 +290,6 @@ fun DrawScope.foregroundIndicator(
     componentSize: Size,
     indicatorColor: Color,
     indicatorStrokeWidth: Float,
-    // indicatorStokeCap: StrokeCap
 ) {
     drawArc(
         size = componentSize,
@@ -230,7 +310,7 @@ fun DrawScope.foregroundIndicator(
 
 @Composable
 fun EmbeddedElements(
-    bigText: Int,
+    bigText: Double,
     bigTextFontSize: TextUnit,
     bigTextColor: Color,
     bigTextSuffix: String,
@@ -245,7 +325,7 @@ fun EmbeddedElements(
         textAlign = TextAlign.Center
     )
     Text(
-        text = "$bigText ${bigTextSuffix.take(2)}",
+        text = "${bigText.toInt()}$bigTextSuffix",
         color = bigTextColor,
         fontSize = bigTextFontSize,
         textAlign = TextAlign.Center,
@@ -255,6 +335,6 @@ fun EmbeddedElements(
 
 @Composable
 @Preview(showBackground = true)
-fun CustomComponentPreview() {
-    CircularMeter()
+fun SensorDashboardPreview() {
+    CommunityScreen()
 }
