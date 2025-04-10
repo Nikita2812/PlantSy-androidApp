@@ -17,11 +17,13 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.CameraAlt
@@ -200,47 +202,149 @@ fun ScanScreen(
                 .fillMaxSize()
         ) {
             if (modalState.value) {
-                ModalBottomSheet(onDismissRequest = {
-                    modalState.value = false
-                }) {
+                ModalBottomSheet(
+                    onDismissRequest = { modalState.value = false },
+                    containerColor = MaterialTheme.colorScheme.surface
+                ) {
                     Column(
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .padding(bottom = 32.dp)
+                            .fillMaxWidth()
                     ) {
+                        // Image Preview Section (if available)
                         selectedImageUri?.let { uri ->
-                            AsyncImage(
-                                model = selectedImageUri,
-                                contentDescription = "Selected image",
+                            Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(200.dp),
-                                contentScale = ContentScale.Crop
-                            )
+                                    .height(200.dp)
+                                    .padding(bottom = 16.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                            ) {
+                                AsyncImage(
+                                    model = selectedImageUri,
+                                    contentDescription  = "Selected image",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
                         }
-                        Text(text = detectedPlant)
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            PlantSwitchDropdown(
-                                onPlantIndexUpdate = { newIndex ->
-                                    plantIndex = newIndex
-                                },
-                                diseaseDBvm = diseaseDBvm
-                            )
 
-                            Text(
-                                modifier = Modifier.clickable {
+                        // Classification Result Section
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f)
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Text(
+                                    text = "Classification Result",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.SettingsSuggest,
+                                        contentDescription = null,
+                                        tint = Color(0xFF4CAF50),
+                                        modifier = Modifier.size(32.dp)
+                                    )
+
+                                    Spacer(modifier = Modifier.width(12.dp))
+
+                                    Text(
+                                        text = detectedPlant,
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
+
+                        // Manual Selection Section
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Text(
+                                    text = if (detectedPlant.isNotEmpty()) "Not a ${detectedPlant.lowercase()}? Select from below" else "Select plant type",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                                    modifier = Modifier.padding(bottom = 8.dp)
+                                )
+
+                                // Using your existing PlantSwitchDropdown with slight UI improvements
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .border(
+                                            width = 1.dp,
+                                            color = MaterialTheme.colorScheme.outline,
+                                            shape = RoundedCornerShape(4.dp)
+                                        )
+                                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                                ) {
+                                    PlantSwitchDropdown(
+                                        onPlantIndexUpdate = { newIndex ->
+                                            plantIndex = newIndex
+                                        },
+                                        diseaseDBvm = diseaseDBvm
+                                    )
+                                }
+                            }
+                        }
+
+                        // Action Buttons
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            OutlinedButton(
+                                onClick = { modalState.value = false },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = Color(0xFF4CAF50)
+                                ),
+                                border = BorderStroke(1.dp, Color(0xFF4CAF50))
+                            ) {
+                                Text(text = "Cancel")
+                            }
+
+                            Button(
+                                onClick = {
                                     if (plantIndex.isMaxValue()) {
                                         navController.navigate(
-                                            route = NavItem.Detail.passResult(
-                                                plantIndex
-                                            )
+                                            route = NavItem.Detail.passResult(plantIndex)
                                         )
+                                        modalState.value = false
                                     }
                                 },
-                                text = "go to details"
-                            )
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF4CAF50)
+                                )
+                            ) {
+                                Text(text = "Go to Details")
+                            }
                         }
                     }
                 }
